@@ -10,7 +10,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	mockdb "github.com/tuanbui-n9/simplebank/db/mock"
@@ -128,16 +127,16 @@ func TestCreateAccount(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		body          gin.H
+		body          io.Reader
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
-			body: gin.H{
-				"owner":    account.Owner,
-				"currency": account.Currency,
-			},
+			body: MustMarshalJSON(CreateAccountRequest{
+				Owner:    account.Owner,
+				Currency: account.Currency,
+			}),
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.CreateAccountParams{
 					Owner:    account.Owner,
@@ -153,10 +152,10 @@ func TestCreateAccount(t *testing.T) {
 		},
 		{
 			name: "InternalError",
-			body: gin.H{
-				"owner":    account.Owner,
-				"currency": account.Currency,
-			},
+			body: MustMarshalJSON(CreateAccountRequest{
+				Owner:    account.Owner,
+				Currency: account.Currency,
+			}),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(1).Return(db.Account{}, sql.ErrConnDone)
 			},
@@ -166,10 +165,10 @@ func TestCreateAccount(t *testing.T) {
 		},
 		{
 			name: "InvalidOwner",
-			body: gin.H{
-				"owner":    "",
-				"currency": account.Currency,
-			},
+			body: MustMarshalJSON(CreateAccountRequest{
+				Owner:    "",
+				Currency: account.Currency,
+			}),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
@@ -179,10 +178,10 @@ func TestCreateAccount(t *testing.T) {
 		},
 		{
 			name: "InvalidCurrency",
-			body: gin.H{
-				"owner":    account.Owner,
-				"currency": "",
-			},
+			body: MustMarshalJSON(CreateAccountRequest{
+				Owner:    account.Owner,
+				Currency: "",
+			}),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
@@ -192,10 +191,10 @@ func TestCreateAccount(t *testing.T) {
 		},
 		{
 			name: "InvalidCurrency2",
-			body: gin.H{
-				"owner":    account.Owner,
-				"currency": "FFF",
-			},
+			body: MustMarshalJSON(CreateAccountRequest{
+				Owner:    account.Owner,
+				Currency: "FFF",
+			}),
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(0)
 			},
@@ -217,11 +216,9 @@ func TestCreateAccount(t *testing.T) {
 
 			server := NewServer(store)
 			recorder := httptest.NewRecorder()
-			data, err := json.Marshal(tc.body)
-			require.NoError(t, err)
 
 			url := "/accounts"
-			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+			request, err := http.NewRequest(http.MethodPost, url, tc.body)
 			require.NoError(t, err)
 
 			server.router.ServeHTTP(recorder, request)
@@ -232,7 +229,7 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func TestListAccounts(t *testing.T) {
-	n := 6
+	n := 5
 	accounts := make([]db.Account, n)
 	for i := 0; i < n; i++ {
 		accounts[i] = randomAccount()
