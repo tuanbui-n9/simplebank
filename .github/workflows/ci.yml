@@ -18,7 +18,7 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_DB: simple_bank
-          POSTGRES_USER: admin
+          POSTGRES_USER: root
           POSTGRES_PASSWORD: secret
         # Set health checks to wait until postgres has started
         options: >-
