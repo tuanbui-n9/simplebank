@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U root -d simple_bank']
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=simple_bank
+    ports:
+      - '5432:5432'
+    volumes:
+      - data-volume:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      - DB_SOURCE=postgresql://root:secret@postgres:5432/simple_bank?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+
+volumes:
+  data-volume:
