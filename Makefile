@@ -1,5 +1,8 @@
+network:
+	docker network create bank-network
+
 postgres:
-	docker run --name postgres -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
+	docker run --name postgres --network bank-network -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:14-alpine
 
 createdb:
 	docker exec -it postgres createdb --username=root --owner=root simple_bank
@@ -31,4 +34,4 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/tuanbui-n9/simplebank/db/sqlc Store
 
-.PHONY: createdb createdb dropdb migrateup migratedown sqlc test server mock migratedown1 migrateup1 postgres
+.PHONY: createdb createdb dropdb migrateup migratedown sqlc test server mock migratedown1 migrateup1 postgres network
