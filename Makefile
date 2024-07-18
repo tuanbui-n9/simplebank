@@ -34,4 +34,10 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/tuanbui-n9/simplebank/db/sqlc Store
 
-.PHONY: createdb createdb dropdb migrateup migratedown sqlc test server mock migratedown1 migrateup1 postgres network
+proto:
+	rm -f pb/*.go
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+		--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+		proto/*.proto
+
+.PHONY: createdb createdb dropdb migrateup migratedown sqlc test server mock migratedown1 migrateup1 postgres network proto
