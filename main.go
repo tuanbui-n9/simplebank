@@ -45,7 +45,7 @@ func runGrpcServer(config util.Config, store db.Store) {
 		log.Fatalf("cannot listen to address: %v", err)
 	}
 
-	log.Printf("start grpc server on %s", config.GrpcServerAddress)
+	log.Printf("start grpc server on %s", listener.Addr().String())
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal("cannot start grpc server")
