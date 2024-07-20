@@ -20,7 +20,6 @@ jobs:
       - name: Configure GCP credentials & Login
         uses: 'google-github-actions/auth@v2'
         with:
-          project_id: 'solution-architect-gcp'
           service_account: ${{ secrets.GCP_SA }}
           workload_identity_provider: ${{ secrets.GCP_WLIP }}
 
