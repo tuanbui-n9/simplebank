@@ -28,6 +28,6 @@ jobs:
           ARTIFACT_URI: ${{ secrets.ARTIFACT_URI }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cat ~/.docker/config.json
+          jq '. + {"credHelpers": {"asia-east1-docker.pkg.dev": "gcloud"}}' ~/.docker/config.json
           docker build -t $ARTIFACT_URI/simple-bank:$IMAGE_TAG -f Dockerfile .
           docker push $ARTIFACT_URI/simple-bank:$IMAGE_TAG
