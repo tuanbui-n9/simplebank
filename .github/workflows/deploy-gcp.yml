@@ -28,5 +28,7 @@ jobs:
           ARTIFACT_URI: ${{ github.ARTIFACT_URI}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          echo $ARTIFACT_URI
+          echo $IMAGE_TAG
           docker build -t $ARTIFACT_URI:$IMAGE_TAG -f Dockerfile .
           docker push $ARTIFACT_URI:$IMAGE_TAG
