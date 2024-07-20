@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+env:
+  ARTIFACT_URL: ${{ env.ARTIFACT_URL }}
+
 jobs:
   build:
     name: Build image
@@ -25,10 +28,12 @@ jobs:
 
       - name: Build, tag, and push docker image to Artifact Registry
         env:
-          ARTIFACT_URI: ${{ secret.ARTIFACT_URI }}
+          ARTIFACT_URI: ${{ secrets.ARTIFACT_URI }}
           IMAGE_TAG: ${{ github.sha }}
+          TN: ${{ env.ARTIFACT_URL }}
         run: |
           echo $ARTIFACT_URI
           echo $IMAGE_TAG
+          echo $TN
           docker build -t $ARTIFACT_URI:$IMAGE_TAG -f Dockerfile .
           docker push $ARTIFACT_URI:$IMAGE_TAG
