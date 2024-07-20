@@ -21,7 +21,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           project_id: 'solution-architect-gcp'
-          service_account_key: ${{ secrets.GCP_SA }}
+          service_account: ${{ secrets.GCP_SA }}
           workload_identity_provider: ${{ secrets.GCP_WLIP }}
 
       - name: Build, tag, and push docker image to Artifact Registry
