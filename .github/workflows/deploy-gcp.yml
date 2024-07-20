@@ -23,11 +23,14 @@ jobs:
           service_account: ${{ secrets.GCP_SA }}
           workload_identity_provider: ${{ secrets.GCP_WLIP }}
 
+      - name: Set up Docker to use the gcloud command-line tool as a credential helper
+        run: |
+          gcloud --quiet auth configure-docker asia-east1-docker.pkg.dev
+
       - name: Build, tag, and push docker image to Artifact Registry
         env:
           ARTIFACT_URI: ${{ secrets.ARTIFACT_URI }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          jq '. + {"credHelpers": {"asia-east1-docker.pkg.dev": "gcloud"}}' ~/.docker/config.json
           docker build -t $ARTIFACT_URI/simple-bank:$IMAGE_TAG -f Dockerfile .
           docker push $ARTIFACT_URI/simple-bank:$IMAGE_TAG
