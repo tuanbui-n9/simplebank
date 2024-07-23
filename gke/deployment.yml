@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: simple-bank
+  name: simple-bank
+  namespace: simple-bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-bank
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: simple-bank
+    spec:
+      containers:
+        - image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:b3e9b5679f105de5ba73722219e479f8f1e1c974
+          name: simple-bank
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: simple-bank-svc
+  name: simple-bank-svc
+  namespace: simple-bank
+spec:
+  ports:
+    - name: simple-bank-svc
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: simple-bank
+  type: ClusterIP
