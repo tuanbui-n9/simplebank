@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	DBSource             string        `mapstructure:"DB_SOURCE" required:"true"`
+	MigrationURL         string        `mapstructure:"MIGRATION_URL" required:"true"`
 	HttpServerAddress    string        `mapstructure:"HTTP_SERVER_ADDRESS" required:"true"`
 	GrpcServerAddress    string        `mapstructure:"GRPC_SERVER_ADDRESS" required:"true"`
 	TokenSymmetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY" required:"true"`
