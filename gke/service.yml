@@ -1,16 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: simple-bank-svc
-  name: simple-bank-svc
-  namespace: simple-bank
+  name: simple-bank-api-service
 spec:
-  ports:
-    - name: simple-bank-svc
-      port: 80
-      protocol: TCP
-      targetPort: 8080
   selector:
-    app: simple-bank
+    app: simple-bank-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http-server
+      name: http-service
+    - protocol: TCP
+      port: 90
+      targetPort: grpc-server
+      name: grpc-service
   type: ClusterIP
