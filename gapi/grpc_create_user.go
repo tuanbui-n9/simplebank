@@ -2,11 +2,14 @@ package gapi
 
 import (
 	"context"
+	"time"
 
+	"github.com/hibiken/asynq"
 	db "github.com/tuanbui-n9/simplebank/db/sqlc"
 	"github.com/tuanbui-n9/simplebank/pb"
 	"github.com/tuanbui-n9/simplebank/util"
 	"github.com/tuanbui-n9/simplebank/validator"
+	"github.com/tuanbui-n9/simplebank/worker"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,6 +42,18 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	}
 
 	// send verification email
+	taskPayload := &worker.PayloadSendVerifyEmail{
+		Username: user.Username,
+	}
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(10 * time.Second),
+		asynq.Queue(worker.QueueCritical),
+	}
+	err = server.taskDistributor.DisTributeTasSendVerifyEmail(ctx, taskPayload, opts...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Internal error: %v", err)
+	}
 
 	resp := &pb.CreateUserResponse{
 		User: convertUser(user),
