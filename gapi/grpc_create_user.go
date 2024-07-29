@@ -2,6 +2,8 @@ package gapi
 
 import (
 	"context"
+	"log"
+	"time"
 
 	db "github.com/tuanbui-n9/simplebank/db/sqlc"
 	"github.com/tuanbui-n9/simplebank/pb"
@@ -48,8 +50,11 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		FullName:       req.GetFullName(),
 		Email:          req.GetEmail(),
 	}
+	startTime := time.Now()
 
 	user, err := server.store.CreateUser(ctx, args)
+	elapsedTime := time.Since(startTime)
+	log.Printf("CreateUser took %s", elapsedTime)
 
 	// txResult, err := server.store.CreateUserTx(ctx, args)
 	if err != nil {
