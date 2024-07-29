@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: simple-bank-api
-          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:4d555f07bb77d67b4960013a9628ae53a69f410d
+          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:b0f12371b5132a2bae074d2ac91aa0d2d5a006fa
           imagePullPolicy: Always
           resources:
             limits:
