@@ -16,12 +16,15 @@ spec:
     spec:
       containers:
         - name: simple-bank-api
-          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:52594248e36d927f564818d7af654e3513ec4331
+          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:800c000dc4d630e575854ee4d0a1c065792f8802
           imagePullPolicy: Always
           resources:
             limits:
               cpu: '0.2'
               memory: '256Mi'
+            requests:
+              cpu: '0.1'
+              memory: '128Mi'
           ports:
             - containerPort: 8080
               name: http-server
@@ -30,5 +33,21 @@ spec:
           envFrom:
             - secretRef:
                 name: simple-bank-k8s-secret
+
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.4
+          args:
+            - '--structured-logs'
+            - '--port=5432'
+            - 'solution-architect-gcp:asia-east1:simplebank'
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: '1Gi'
+              cpu: '0.5'
+            requests:
+              memory: '512Mi'
+              cpu: '0.2'
       serviceAccountName: simple-bank
       restartPolicy: Always
