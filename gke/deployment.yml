@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: simple-bank-api
-          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:44b564818ebcb2d56599078ca94645a283a624df
+          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:b47081117e73c037f0ed0155fac7848ce9c4fa74
           imagePullPolicy: Always
           resources:
             limits:
@@ -30,3 +30,5 @@ spec:
           envFrom:
             - secretRef:
                 name: simple-bank-k8s-secret
+      serviceAccountName: simple-bank
+      restartPolicy: Always
