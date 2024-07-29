@@ -2,9 +2,9 @@ package gapi
 
 import (
 	"context"
-	"log"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	db "github.com/tuanbui-n9/simplebank/db/sqlc"
 	"github.com/tuanbui-n9/simplebank/pb"
 	"github.com/tuanbui-n9/simplebank/util"
@@ -54,7 +54,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 
 	user, err := server.store.CreateUser(ctx, args)
 	elapsedTime := time.Since(startTime)
-	log.Printf("CreateUser took %s", elapsedTime)
+	log.Info().Msgf("CreateUser took %s", elapsedTime)
 
 	// txResult, err := server.store.CreateUserTx(ctx, args)
 	if err != nil {
