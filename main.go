@@ -32,7 +32,7 @@ func main() {
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal().Msg("cannot load config")
+		log.Fatal().Msgf("cannot load config %s", err)
 	}
 	if config.Environment == "development" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
