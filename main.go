@@ -70,7 +70,7 @@ func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
 func runDatabaseMigrations(migrationURL string, dbSource string) {
 	m, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatal().Msg("cannot create migration")
+		log.Fatal().Msgf("cannot create migration: %s", err)
 	}
 
 	err = m.Up()

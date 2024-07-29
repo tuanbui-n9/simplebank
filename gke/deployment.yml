@@ -16,14 +16,17 @@ spec:
     spec:
       containers:
         - name: simple-bank-api
-          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:b3e9b5679f105de5ba73722219e479f8f1e1c974
+          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:44b564818ebcb2d56599078ca94645a283a624df
           imagePullPolicy: Always
           resources:
             limits:
-              cpu: '1'
-              memory: '512Mi'
+              cpu: '0.2'
+              memory: '256Mi'
           ports:
             - containerPort: 8080
               name: http-server
             - containerPort: 9090
               name: grpc-server
+          envFrom:
+            - secretRef:
+                name: simple-bank-k8s-secret
