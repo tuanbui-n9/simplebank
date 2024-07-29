@@ -2,14 +2,11 @@ package gapi
 
 import (
 	"context"
-	"time"
 
-	"github.com/hibiken/asynq"
 	db "github.com/tuanbui-n9/simplebank/db/sqlc"
 	"github.com/tuanbui-n9/simplebank/pb"
 	"github.com/tuanbui-n9/simplebank/util"
 	"github.com/tuanbui-n9/simplebank/validator"
-	"github.com/tuanbui-n9/simplebank/worker"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,28 +22,36 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "Internal error: %v", err)
 	}
 
-	args := db.CreateUserTxParams{
-		CreateUserParams: db.CreateUserParams{
-			Username:       req.GetUsername(),
-			HashedPassword: hashedPassword,
-			FullName:       req.GetFullName(),
-			Email:          req.GetEmail(),
-		},
-		AfterCreate: func(user db.User) error {
-			// send verification email
-			taskPayload := &worker.PayloadSendVerifyEmail{
-				Username: user.Username,
-			}
-			opts := []asynq.Option{
-				asynq.MaxRetry(10),
-				asynq.ProcessIn(10 * time.Second),
-				asynq.Queue(worker.QueueCritical),
-			}
-			return server.taskDistributor.DisTributeTasSendVerifyEmail(ctx, taskPayload, opts...)
-		},
+	// args := db.CreateUserTxParams{
+	// 	CreateUserParams: db.CreateUserParams{
+	// 		Username:       req.GetUsername(),
+	// 		HashedPassword: hashedPassword,
+	// 		FullName:       req.GetFullName(),
+	// 		Email:          req.GetEmail(),
+	// 	},
+	// 	AfterCreate: func(user db.User) error {
+	// 		// send verification email
+	// 		taskPayload := &worker.PayloadSendVerifyEmail{
+	// 			Username: user.Username,
+	// 		}
+	// 		opts := []asynq.Option{
+	// 			asynq.MaxRetry(10),
+	// 			asynq.ProcessIn(10 * time.Second),
+	// 			asynq.Queue(worker.QueueCritical),
+	// 		}
+	// 		return server.taskDistributor.DisTributeTasSendVerifyEmail(ctx, taskPayload, opts...)
+	// 	},
+	// }
+	args := db.CreateUserParams{
+		Username:       req.GetUsername(),
+		HashedPassword: hashedPassword,
+		FullName:       req.GetFullName(),
+		Email:          req.GetEmail(),
 	}
 
-	txResult, err := server.store.CreateUserTx(ctx, args)
+	user, err := server.store.CreateUser(ctx, args)
+
+	// txResult, err := server.store.CreateUserTx(ctx, args)
 	if err != nil {
 		errCode := db.ErrorCode(err)
 		if errCode == db.UniqueViolation {
@@ -56,7 +61,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	}
 
 	resp := &pb.CreateUserResponse{
-		User: convertUser(txResult.User),
+		User: convertUser(user),
 	}
 
 	return resp, nil

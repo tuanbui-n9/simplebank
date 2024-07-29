@@ -37,8 +37,7 @@ func main() {
 	if config.Environment == "development" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
-	log.Info().Msgf("start application in %s mode", config.Environment)
-	log.Info().Msgf("DB source %s", config.DBSource)
+
 	conn, err := pgxpool.New(context.Background(), config.DBSource)
 
 	if err != nil {
