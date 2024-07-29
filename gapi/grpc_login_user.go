@@ -3,7 +3,9 @@ package gapi
 import (
 	"context"
 	"database/sql"
+	"time"
 
+	"github.com/rs/zerolog/log"
 	db "github.com/tuanbui-n9/simplebank/db/sqlc"
 	"github.com/tuanbui-n9/simplebank/pb"
 	"github.com/tuanbui-n9/simplebank/util"
@@ -19,7 +21,12 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 	if len(violations) > 0 {
 		invalidArgumentError(violations)
 	}
+	startTime := time.Now()
+
 	user, err := server.store.GetUser(ctx, req.Username)
+	elapsedTime := time.Since(startTime)
+	log.Info().Msgf("get user took %s", elapsedTime)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "user not found: %v", err)
@@ -44,6 +51,8 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 
 	metadata := server.extractMetaData(ctx)
 
+	startTime1 := time.Now()
+
 	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
 		ID:           refreshPayload.ID,
 		Username:     user.Username,
@@ -53,6 +62,8 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		ExpiresAt:    refreshPayload.ExpireAt,
 		IsBlocked:    false,
 	})
+	elapsedTime1 := time.Since(startTime1)
+	log.Info().Msgf("create session took %s", elapsedTime1)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create session: %v", err)
 	}
