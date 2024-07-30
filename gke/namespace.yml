@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: simple-bank
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-secrets

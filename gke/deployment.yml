@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-bank-api-deployment
+  name: sb-deploy
   labels:
-    app: simple-bank-api
+    app: sb-api
+  namespace: simple-bank
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: simple-bank-api
+      app: sb-api
   template:
     metadata:
       labels:
-        app: simple-bank-api
+        app: sb-api
     spec:
       containers:
-        - name: simple-bank-api
-          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:ac9697f14a44b8d80240c82d6ddb95a4731946e5
+        - name: sb-api
+          image: asia-east1-docker.pkg.dev/solution-architect-gcp/simple-bank/simple-bank:b16d59ca2206beab32f2b249b933e2fecfe7fa87
           imagePullPolicy: Always
           resources:
             limits:
@@ -49,5 +50,5 @@ spec:
             requests:
               memory: '512Mi'
               cpu: '0.2'
-      serviceAccountName: simple-bank
+      serviceAccountName: simple-bank-private
       restartPolicy: Always
